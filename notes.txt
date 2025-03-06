@@ -1,0 +1,34 @@
+I opened the Makefile in Emacs and added a check target:
+./randall 1020 | wc -c | grep -q '^1020$'
+I reorganized the function definitions and removed the static keyword
+static limits the associated value to the local file
+I updated the Makefile so it compiles all the newly added .c sources
+I verified the resulting .c file using the Makefile check target
+I introduced -i and -o options, with their defaults stored in char* variables
+I used getopt, and argv[optind] retrieves the nbytes argument
+argc = the total number of command-line arguments
+argv = the array containing the command-line argument strings
+I implemented mrand48_r by using the drand_data struct and rand_state
+I conditionally determined which random generator to use inside output.c
+I allocated a buffer of user-specified nbytes dynamically
+If nbytes is not divisible by 8, the remainder of the buffer is filled by casting to char*
+I checked if malloc() returned NULL; if so, the code reports an error
+I freed the allocated memory and called finalize() after initialization
+Since write() doesn't automatically stop at the buffer's end, I added a boundary checker:
+(nbytes - written_bytes) < value ? (nbytes - written_bytes) : value;
+
+Time:
+time dd if=/dev/urandom ibs=8192 obs=8192 count=16384 > /dev/null
+0.920 seconds
+
+time ./randall 133562368
+3.90 seconds
+
+time ./randall 133562368
+4.18 seconds
+
+time ./randall -o 8192 133562368
+2.94 seconds
+
+time ./randall -i /dev/urandom -o 8192 133562368
+1.31 seconds
